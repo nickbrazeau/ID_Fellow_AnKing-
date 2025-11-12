@@ -160,11 +160,11 @@ class AnkiCardConverter:
             cells = [cell.strip() for cell in line.split('|')]
             cells = [c for c in cells if c]  # Remove empty strings
 
-            # First row is header
+            # First row is header (dark blue background with white text for night mode compatibility)
             if i == 0:
-                html += '<tr style="background-color: #f0f0f0;">'
+                html += '<tr style="background-color: #2c5aa0; color: white;">'
                 for cell in cells:
-                    html += f'<th style="padding: 8px; text-align: left;">{cell}</th>'
+                    html += f'<th style="padding: 8px; text-align: left; color: white;">{cell}</th>'
                 html += '</tr>'
             else:
                 html += '<tr>'
@@ -205,6 +205,8 @@ class AnkiCardConverter:
         text = '\n'.join(result_lines)
 
         # Convert markdown headers to HTML (do this before bold to avoid conflicts)
+        # #### Header -> <h4>Header</h4>
+        text = re.sub(r'^#### (.+)$', r'<h4>\1</h4>', text, flags=re.MULTILINE)
         # ### Header -> <h3>Header</h3>
         text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', text, flags=re.MULTILINE)
         # ## Header -> <h2>Header</h2>
