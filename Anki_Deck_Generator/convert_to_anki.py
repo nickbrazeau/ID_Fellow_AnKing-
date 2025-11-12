@@ -237,13 +237,13 @@ class AnkiCardConverter:
 
         # Build the front of the card (question) - convert markdown to HTML
         front = self.markdown_to_html(card_data["question"])
-        # Wrap front in div with smaller font
-        front = f'<div style="font-size: 14px; line-height: 1.4;">{front}</div>'
+        # Wrap front in div with larger, bold font for better readability
+        front = f'<div style="font-size: 16px; line-height: 1.4; font-weight: 500;">{front}</div>'
 
         # Build the back of the card (answer + optional media) - convert markdown to HTML
         back = self.markdown_to_html(card_data["answer"])
-        # Wrap back in div with smaller font and tighter spacing
-        back = f'<div style="font-size: 13px; line-height: 1.3;">{back}</div>'
+        # Wrap back in div with crisp, readable font
+        back = f'<div style="font-size: 13px; line-height: 1.3; font-weight: 400; -webkit-font-smoothing: antialiased;">{back}</div>'
         if card_data["media"] and card_data["media"].strip():
             media = card_data["media"].strip()
             # Only add images if we have actual image files (not just references)
