@@ -82,30 +82,56 @@ class AnkiCardConverter:
             "sources": ""
         }
 
-        # Extract question (after ## Question)
+        # Try format 1: ## Question / ## Answer (header format)
         q_match = re.search(r'##\s*Question\s*\n+(.+?)(?=##\s*Answer)', body, re.DOTALL)
         if q_match:
             card["question"] = q_match.group(1).strip()
 
-        # Extract answer (after ## Answer)
-        a_match = re.search(r'##\s*Answer\s*\n+(.+?)(?=##\s*(?:Key Points|Sources|Media)|$)', body, re.DOTALL)
+        # Try format 2: **Q:** / **A:** (bold format) if header format not found
+        if not card["question"]:
+            q_match = re.search(r'\*\*Q:\*\*\s*(.+?)(?=\*\*A:\*\*)', body, re.DOTALL)
+            if q_match:
+                card["question"] = q_match.group(1).strip()
+
+        # Extract answer - try header format first
+        a_match = re.search(r'##\s*Answer\s*\n+(.+?)(?=##\s*(?:Key Points|Sources|Media)|\*\*(?:Key Points|Media|Sources):\*\*|$)', body, re.DOTALL)
         if a_match:
             card["answer"] = a_match.group(1).strip()
+        else:
+            # Try bold format
+            a_match = re.search(r'\*\*A:\*\*\s*(.+?)(?=\*\*(?:Key Points|Media|Sources):\*\*|$)', body, re.DOTALL)
+            if a_match:
+                card["answer"] = a_match.group(1).strip()
 
-        # Extract Key Points if present
-        kp_match = re.search(r'##\s*Key Points\s*\n+(.+?)(?=##\s*(?:Sources|Media)|$)', body, re.DOTALL)
+        # Extract Key Points if present (header format)
+        kp_match = re.search(r'##\s*Key Points\s*\n+(.+?)(?=##\s*(?:Sources|Media)|\*\*(?:Media|Sources):\*\*|$)', body, re.DOTALL)
         if kp_match:
             card["answer"] += "\n\n### Key Points\n\n" + kp_match.group(1).strip()
+        else:
+            # Try bold format for Key Points
+            kp_match = re.search(r'\*\*Key Points:\*\*\s*(.+?)(?=\*\*(?:Media|Sources):\*\*|$)', body, re.DOTALL)
+            if kp_match:
+                card["answer"] += "\n\n### Key Points\n\n" + kp_match.group(1).strip()
 
-        # Extract media (after ## Media)
-        m_match = re.search(r'##\s*Media\s*\n+(.+?)(?=##\s*Sources|$)', body, re.DOTALL)
+        # Extract media (try header format first)
+        m_match = re.search(r'##\s*Media\s*\n+(.+?)(?=##\s*Sources|\*\*Sources:\*\*|$)', body, re.DOTALL)
         if m_match:
             card["media"] = m_match.group(1).strip()
+        else:
+            # Try bold format
+            m_match = re.search(r'\*\*Media:\*\*\s*(.+?)(?=\*\*Sources:\*\*|$)', body, re.DOTALL)
+            if m_match:
+                card["media"] = m_match.group(1).strip()
 
-        # Extract sources (after ## Sources)
-        s_match = re.search(r'##\s*Sources\s*\n+(.+?)(?=##\s*Media|$)', body, re.DOTALL)
+        # Extract sources (try header format first)
+        s_match = re.search(r'##\s*Sources\s*\n+(.+?)(?=##\s*Media|\*\*Media:\*\*|$)', body, re.DOTALL)
         if s_match:
             card["sources"] = s_match.group(1).strip()
+        else:
+            # Try bold format
+            s_match = re.search(r'\*\*Sources:\*\*\s*(.+?)(?=\*\*Media:\*\*|$)', body, re.DOTALL)
+            if s_match:
+                card["sources"] = s_match.group(1).strip()
 
         return card
 
