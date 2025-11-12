@@ -135,16 +135,31 @@ class AnkiCardConverter:
 
         return card
 
+    def markdown_to_html(self, text: str) -> str:
+        """Convert markdown formatting to HTML."""
+        # Bold: **text** or __text__ -> <b>text</b>
+        text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+        text = re.sub(r'__(.+?)__', r'<b>\1</b>', text)
+
+        # Italic: *text* or _text_ -> <i>text</i>
+        text = re.sub(r'\*(.+?)\*', r'<i>\1</i>', text)
+        text = re.sub(r'_(.+?)_', r'<i>\1</i>', text)
+
+        # Code: `text` -> <code>text</code>
+        text = re.sub(r'`(.+?)`', r'<code>\1</code>', text)
+
+        return text
+
     def format_for_anki(self, card_data: Dict, frontmatter: Dict) -> List[str]:
         """Format card data as TSV row for Anki."""
         # Get deck name (default to "Infectious Diseases")
         deck = frontmatter.get("deck", "Infectious Diseases")
 
-        # Build the front of the card (question)
-        front = card_data["question"]
+        # Build the front of the card (question) - convert markdown to HTML
+        front = self.markdown_to_html(card_data["question"])
 
-        # Build the back of the card (answer + optional media)
-        back = card_data["answer"]
+        # Build the back of the card (answer + optional media) - convert markdown to HTML
+        back = self.markdown_to_html(card_data["answer"])
         if card_data["media"] and card_data["media"].strip():
             media = card_data["media"].strip()
             # Only add images if we have actual image files (not just references)
