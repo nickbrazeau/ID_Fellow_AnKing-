@@ -135,8 +135,75 @@ class AnkiCardConverter:
 
         return card
 
+    def convert_markdown_table_to_html(self, table_text: str) -> str:
+        """Convert a markdown table to HTML table."""
+        lines = table_text.strip().split('\n')
+        if len(lines) < 2:
+            return table_text
+
+        # Check if this is a valid markdown table
+        if not lines[0].strip().startswith('|') or not lines[1].strip().startswith('|'):
+            return table_text
+
+        html = '<table border="1" style="border-collapse: collapse; width: 100%;">\n'
+
+        for i, line in enumerate(lines):
+            line = line.strip()
+            if not line.startswith('|'):
+                continue
+
+            # Skip separator line (contains only |, -, and spaces)
+            if re.match(r'^[\|\-\s:]+$', line):
+                continue
+
+            # Split by | and remove empty first/last elements
+            cells = [cell.strip() for cell in line.split('|')]
+            cells = [c for c in cells if c]  # Remove empty strings
+
+            # First row is header
+            if i == 0:
+                html += '  <tr style="background-color: #f0f0f0;">\n'
+                for cell in cells:
+                    html += f'    <th style="padding: 8px; text-align: left;">{cell}</th>\n'
+                html += '  </tr>\n'
+            else:
+                html += '  <tr>\n'
+                for cell in cells:
+                    html += f'    <td style="padding: 8px;">{cell}</td>\n'
+                html += '  </tr>\n'
+
+        html += '</table>'
+        return html
+
     def markdown_to_html(self, text: str) -> str:
         """Convert markdown formatting to HTML."""
+        # Convert markdown tables to HTML tables
+        # Find tables (lines starting with | and containing at least 2 rows)
+        lines = text.split('\n')
+        in_table = False
+        table_lines = []
+        result_lines = []
+
+        for line in lines:
+            if line.strip().startswith('|'):
+                in_table = True
+                table_lines.append(line)
+            else:
+                if in_table and table_lines:
+                    # Convert accumulated table
+                    table_html = self.convert_markdown_table_to_html('\n'.join(table_lines))
+                    result_lines.append(table_html)
+                    table_lines = []
+                    in_table = False
+                result_lines.append(line)
+
+        # Handle table at end of text
+        if in_table and table_lines:
+            table_html = self.convert_markdown_table_to_html('\n'.join(table_lines))
+            result_lines.append(table_html)
+
+        text = '\n'.join(result_lines)
+
         # Bold: **text** or __text__ -> <b>text</b>
         text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
         text = re.sub(r'__(.+?)__', r'<b>\1</b>', text)
@@ -147,6 +214,9 @@ class AnkiCardConverter:
 
         # Code: `text` -> <code>text</code>
         text = re.sub(r'`(.+?)`', r'<code>\1</code>', text)
+
+        # Convert markdown images to HTML: ![alt](path) -> <img src="path" alt="alt">
+        text = re.sub(r'!\[(.*?)\]\((.*?)\)', r'<img src="\2" alt="\1" style="max-width: 100%;">', text)
 
         return text
 
