@@ -136,7 +136,7 @@ class AnkiCardConverter:
         return card
 
     def convert_markdown_table_to_html(self, table_text: str) -> str:
-        """Convert a markdown table to HTML table."""
+        """Convert a markdown table to HTML table (compact, no extra whitespace)."""
         lines = table_text.strip().split('\n')
         if len(lines) < 2:
             return table_text
@@ -145,7 +145,7 @@ class AnkiCardConverter:
         if not lines[0].strip().startswith('|') or not lines[1].strip().startswith('|'):
             return table_text
 
-        html = '<table border="1" style="border-collapse: collapse; width: 100%;">\n'
+        html = '<table border="1" style="border-collapse: collapse; width: 100%;">'
 
         for i, line in enumerate(lines):
             line = line.strip()
@@ -162,15 +162,15 @@ class AnkiCardConverter:
 
             # First row is header
             if i == 0:
-                html += '  <tr style="background-color: #f0f0f0;">\n'
+                html += '<tr style="background-color: #f0f0f0;">'
                 for cell in cells:
-                    html += f'    <th style="padding: 8px; text-align: left;">{cell}</th>\n'
-                html += '  </tr>\n'
+                    html += f'<th style="padding: 8px; text-align: left;">{cell}</th>'
+                html += '</tr>'
             else:
-                html += '  <tr>\n'
+                html += '<tr>'
                 for cell in cells:
-                    html += f'    <td style="padding: 8px;">{cell}</td>\n'
-                html += '  </tr>\n'
+                    html += f'<td style="padding: 8px;">{cell}</td>'
+                html += '</tr>'
 
         html += '</table>'
         return html
@@ -203,6 +203,14 @@ class AnkiCardConverter:
             result_lines.append(table_html)
 
         text = '\n'.join(result_lines)
+
+        # Convert markdown headers to HTML (do this before bold to avoid conflicts)
+        # ### Header -> <h3>Header</h3>
+        text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', text, flags=re.MULTILINE)
+        # ## Header -> <h2>Header</h2>
+        text = re.sub(r'^## (.+)$', r'<h2>\1</h2>', text, flags=re.MULTILINE)
+        # # Header -> <h1>Header</h1>
+        text = re.sub(r'^# (.+)$', r'<h1>\1</h1>', text, flags=re.MULTILINE)
 
         # Bold: **text** or __text__ -> <b>text</b>
         text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
