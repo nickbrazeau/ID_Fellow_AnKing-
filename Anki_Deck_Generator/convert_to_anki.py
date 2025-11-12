@@ -334,9 +334,22 @@ class AnkiCardConverter:
                 # Skip the Deck column (row[0]), keep Front (row[1]), Back (row[2]), Tags (row[4])
                 # Skip Extra (row[3]) as it's not used
                 anki_row = [row[1], row[2], row[4]]  # Front, Back, Tags
-                # Escape tabs and newlines in content
-                escaped_row = [field.replace('\t', ' ').replace('\n', '<br>') for field in anki_row]
-                f.write('\t'.join(escaped_row) + '\n')
+                # Escape tabs and convert newlines to <br>, then clean up excess whitespace
+                cleaned_row = []
+                for field in anki_row:
+                    # Replace tabs with space
+                    field = field.replace('\t', ' ')
+                    # Replace newlines with <br>
+                    field = field.replace('\n', '<br>')
+                    # Remove multiple consecutive <br> tags (keep max 2)
+                    field = re.sub(r'(<br>\s*){3,}', '<br><br>', field)
+                    # Remove leading/trailing <br> tags
+                    field = re.sub(r'^(<br>\s*)+', '', field)
+                    field = re.sub(r'(<br>\s*)+$', '', field)
+                    # Clean up multiple spaces
+                    field = re.sub(r'  +', ' ', field)
+                    cleaned_row.append(field)
+                f.write('\t'.join(cleaned_row) + '\n')
 
         # Save metadata
         self.save_metadata()
