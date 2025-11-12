@@ -1,227 +1,241 @@
-# 🚀 START HERE - New Session Checklist
+# 🎯 Start Here: ID Anki Card Generator
 
-## For Claude: Read This FIRST Every Session
+## Current Status
 
-This checklist ensures you have full context, even if you're a brand new Claude instance who has never seen this repository before.
+✅ **503 cards generated** (IDs 251-347 across all major categories)
+✅ **Typography optimized** for Anki readability (20% font increase, night mode compatible)
+✅ **Convert script working** - All markdown → HTML conversion functional
+✅ **Repository cleaned** - Only essential files remain
 
----
-
-## ✅ Pre-Generation Checklist
-
-### **Step 1: Load Conversation Memory**
-```bash
-cd /Users/nbrazeau/Desktop/ID_Curriculum/Anki_Deck_Generator
-cat CONVERSATION_CONTEXT.md
-```
-
-**What you'll learn:**
-- Full conversation history
-- All decisions made
-- User preferences and style
-- What NOT to do
-- Technical details
-
-**Time:** 2-3 minutes to read
-
----
-
-### **Step 2: Check Current Progress**
-```bash
-cat SESSION_RESUME.md
-```
-
-**What you'll see:**
-- Current progress (X/296 cards)
-- Where to resume generation
-- Recent activity log
-- Next card ID to use
-
-**Time:** 30 seconds
-
----
-
-### **Step 3: Verify System Status**
-```bash
-python3 session_manager.py
-```
-
-**Expected output:**
-```
-Progress: X/296 (Y%)
-Current: [category/topic or None]
-Next ID: ###
-Resume from: [specific topic]
-```
-
-**Time:** 5 seconds
-
----
-
-### **Step 4: Check Recent User Edits** *(if any commits exist)*
-```bash
-git log --oneline | head -10
-git log -p --follow cards/ | head -200
-```
-
-**What to look for:**
-- User's editing patterns
-- Preferred detail level
-- Mnemonic style preferences
-- Citation preferences
-
-**Time:** 1-2 minutes *(skip if no commits yet)*
-
----
-
-### **Step 5: Review Key Documentation** *(if needed)*
-
-Quick references:
-- `CLAUDE.md` - Main instructions
-- `CONTENT_STRATEGY.md` - Evidence-based approach
-- `LONG_TERM_GENERATION_GUIDE.md` - System usage
-- `IMAGE_RETRIEVAL_GUIDE.md` - Image download workflows
-
-**Time:** As needed (usually not required every session)
-
----
-
-## 🎯 You're Ready When You Can Answer:
-
-- [ ] Where am I resuming generation? (from SESSION_RESUME.md)
-- [ ] What's the next card ID? (from session_manager.py)
-- [ ] What are the content priorities? (PubMed → Repository → IBCC)
-- [ ] What must every card include? (mnemonic, citations, images)
-- [ ] How do I log progress? (session_manager.py API)
-- [ ] What image sources work? (IBCC, WikEM, PMC)
-- [ ] What's the user's style? (from CONVERSATION_CONTEXT.md)
-
----
-
-## 🚀 Start Generating
-
-Once checklist complete:
-
-```python
-from session_manager import SessionManager
-sm = SessionManager()
-
-# Get resume point
-topic = sm.get_resume_point()
-print(f"Resuming: {topic}")
-
-# Get next ID
-card_id = sm.get_next_card_id()
-
-# Generate card following CONTENT_STRATEGY.md
-# 1. Search PubMed/guidelines
-# 2. Check repository PDFs
-# 3. Search for images
-# 4. Create markdown with mnemonic
-# 5. Download images
-
-# Log completion
-sm.mark_card_completed('category', card_id, 'filename.md')
-```
+**Latest Deck:** `generated_decks/ID_deck_2025-11-12.tsv` (3.7 MB, ready for Anki import)
 
 ---
 
 ## 📋 Quick Reference
 
-### **Card Requirements:**
-- ✅ True mnemonic (when applicable)
-- ✅ Evidence from ≥2 sources
-- ✅ Specific citations (not generic)
-- ✅ Visual aid (image/table/mnemonic)
-- ✅ ≤3 sentences per answer
-- ✅ Table format for test interpretation
+### Card Generation Workflow
 
-### **Content Priority:**
-1. 🥇 PubMed, IDSA/CDC guidelines
-2. 🥈 Repository PDFs (articles/, Lessons_of_Stout/)
-3. 🥉 IBCC/WikEM (supplementary)
+```bash
+# 1. Claude monitors for new content triggers:
+# - New PDFs in articles/
+# - New files in notes/
+# - User feedback on existing cards
+# - Git commits with card edits
 
-### **Image Priority:**
-1. 🥇 PMC open-access, guideline algorithms
-2. 🥈 IBCC/WikEM teaching diagrams
-3. 🥉 Repository PDF extractions
+# 2. Generate new cards:
+# - Research primary literature (PubMed, IDSA guidelines)
+# - Review repository PDFs
+# - Create markdown in cards/ subdirectories
+# - Download images to images/
 
-### **Progress Logging:**
-```python
-# After EVERY card
-sm.mark_card_completed(category, card_id, filename)
+# 3. Convert to Anki format:
+python3 convert_to_anki.py
+# Output: generated_decks/ID_deck_YYYY-MM-DD.tsv
 
-# Check status anytime
-sm.get_progress_summary()
+# 4. Commit changes:
+git add cards/ images/ generated_decks/
+git commit -m "Generated cards on [topic]"
+```
+
+### Learning from User Feedback
+
+Claude learns from your edits by analyzing git diffs:
+```bash
+# Claude runs this to see what you changed:
+git log -p --follow cards/ | head -200
+
+# This reveals:
+# - Phrasing preferences
+# - Detail level adjustments
+# - Mnemonic effectiveness
+# - Question restructuring patterns
+```
+
+**You just edit and commit - the diffs speak for themselves!**
+
+---
+
+## 🔔 Monitoring Triggers
+
+Claude automatically watches for:
+
+### 1. New Literature (articles/)
+- Any new PDFs added → Research topic, generate cards
+- Current: Blastomycosis (17 PDFs), Oral antibiotics for osteomyelitis
+
+### 2. New Resources (notes/)
+- Lessons_of_Stout/: Syndrome-organized literature
+- bugs&drugs/: Antibiotic dosing guides, PK tables
+- IDpearls/: Teaching images
+- lectures/: Fellow presentations
+- Tuesday_ID_Case_Series/: Case discussions
+
+### 3. User Feedback
+- Git commits editing existing cards
+- Comments about card quality, detail level, mnemonics
+- Requests for specific topics
+
+### 4. New Images
+- Screenshots added to images/
+- Febrile Podcast downloads
+- X.com infographic screenshots
+
+---
+
+## 📂 Repository Structure
+
+```
+ID_Curriculum/
+├── Anki_Deck_Generator/          # Working directory
+│   ├── cards/                    # 503 markdown cards
+│   │   ├── antimicrobials/       # 19 cards (IDs 251-269)
+│   │   ├── syndromes/            # 24 cards (IDs 270-293)
+│   │   ├── organisms/            # Viruses, bacteria, fungi, parasites
+│   │   ├── host_factors/         # Immunocompromised hosts
+│   │   ├── diagnostics/          # Diagnostic approaches
+│   │   └── misc/                 # Special topics
+│   ├── images/                   # Teaching images, mnemonics
+│   ├── generated_decks/          # TSV output for Anki
+│   ├── convert_to_anki.py        # Conversion script (optimized)
+│   └── card_metadata.json        # Auto-generated registry
+├── articles/                     # Primary literature PDFs
+│   ├── Blasto literature/        # 17 PDFs
+│   └── Oral abx for osteo/       # Treatment studies
+├── notes/                        # Educational resources
+│   ├── Lessons_of_Stout/         # Curated by syndrome
+│   ├── bugs&drugs/               # Antibiotic references
+│   ├── IDpearls/                 # Teaching images
+│   ├── lectures/                 # Fellow presentations
+│   └── Tuesday_ID_Case_Series/   # Case discussions
+├── case_presentations/           # PowerPoints for conferences
+└── claude.md                     # Primary instructions (read first!)
 ```
 
 ---
 
-## ⚠️ Common Mistakes to Avoid
+## 🎨 Card Template
 
-❌ **Starting without reading CONVERSATION_CONTEXT.md**
-→ You'll miss critical decisions and preferences
+```markdown
+---
+id: unique-id_number
+category: organisms|syndromes|antimicrobials|host_factors|diagnostics|misc
+tags: [tag1, tag2, tag3]
+deck: Infectious Diseases
+created: YYYY-MM-DD
+modified: YYYY-MM-DD
+---
 
-❌ **Skipping SESSION_RESUME.md**
-→ You'll start from wrong topic
+## Card Title
 
-❌ **Not checking git log**
-→ You'll miss user's style preferences
+**Q:** Question text?
 
-❌ **Forgetting to log progress**
-→ Next session won't know what was completed
+**A:** Answer with **bold**, *italic*, tables, lists
 
-❌ **Using generic citations**
-→ User specifically requested specific sources
+| Column 1 | Column 2 |
+|----------|----------|
+| Data     | Data     |
 
-❌ **Skipping primary literature search**
-→ User wants PubMed/guidelines FIRST, not just IBCC
+**Key Points:**
+- Point 1
+- Point 2
 
-✅ **Do the checklist every single session**
-✅ **Read CONVERSATION_CONTEXT.md completely**
-✅ **Follow evidence-based workflow**
-✅ **Log progress after each card**
+**Mnemonic:** "Memorable phrase or acronym"
+
+**Pearl:** High-yield clinical insight in 1-2 sentences.
+
+**Media:** images/filename.png
+
+**Sources:** [IDSA 2024], [PMC12345678], [IBCC Pneumonia]
+```
 
 ---
 
-## 🔄 If Something Seems Wrong
+## 🧠 Content Principles
 
-### **Lost context?**
-→ Read CONVERSATION_CONTEXT.md again completely
+### Evidence-Based Hierarchy:
+1. **Primary:** PubMed, IDSA/CDC guidelines, clinical trials
+2. **Secondary:** Repository PDFs (articles/, notes/)
+3. **Tertiary:** Medical education sites (IBCC, WikEM, LITFL)
+4. **Optional:** Febrile Podcast, X.com educators (manual download)
 
-### **Unsure where to resume?**
-→ Check SESSION_RESUME.md and run session_manager.py
+### Card Design:
+- **Mnemonics:** Top priority for retention
+- **Clinical reasoning:** Diagnosis → workup → management → pearls
+- **Pattern recognition:** Emphasize distinguishing features
+- **Contrastive learning:** "How to differentiate X vs Y"
+- **Succinct:** ≤3 sentences per answer block
+- **Visual:** Images strongly preferred
 
-### **Card ID seems wrong?**
-→ Check progress_tracker.json "next_id" field
-
-### **Need to restart from topic?**
-→ Edit progress_tracker.json "current_topic" field
-
-### **System behaving oddly?**
-→ Read LONG_TERM_GENERATION_GUIDE.md troubleshooting section
-
----
-
-## ✅ Completion
-
-Once you've completed the checklist:
-1. You understand the full context
-2. You know where to resume
-3. You know the user's preferences
-4. You're ready to generate high-quality cards
-
-**Total time: 5-10 minutes per session**
-
-**This investment ensures continuity across terminal losses!**
+### Quality Markers:
+✅ Evidence from ≥2 primary sources
+✅ Specific citations (not generic textbook chapters)
+✅ Current (prefer last 3-5 years)
+✅ Visual aid (figure, table, or mnemonic)
+✅ Mnemonic or memory aid
 
 ---
 
-## 📝 End of Session
+## 🔧 Maintenance Commands
 
-Before you finish:
-1. Ensure all cards logged with `sm.mark_card_completed()`
-2. Progress auto-saved automatically
-3. SESSION_RESUME.md auto-updated
-4. Ready for next session!
+```bash
+# Regenerate deck after editing cards
+python3 convert_to_anki.py
 
-No need to manually save anything - system handles it.
+# Check card count
+find cards -name "*.md" | wc -l
+
+# Find highest card ID
+grep -r "^id:" cards/ | sed 's/.*_\([0-9]*\)$/\1/' | sort -n | tail -1
+
+# Search for topic in existing cards
+grep -r "topic" cards/
+
+# View recent card edits
+git log -p --follow cards/ | head -100
+
+# Check repository size
+du -sh . cards/ generated_decks/
+```
+
+---
+
+## 🚀 Next Steps
+
+**For Claude:**
+1. Monitor for new files in articles/ and notes/
+2. Watch for git commits editing existing cards
+3. Learn preferences from git diffs
+4. Generate cards triggered by new content or user feedback
+
+**For User:**
+1. Drop new PDFs into articles/ → Claude generates cards
+2. Edit cards and commit → Claude learns from diffs
+3. Provide feedback on card quality, detail level
+4. Manually download Febrile/X.com images to images/ if needed
+
+---
+
+## 📊 Current Coverage (503 Cards)
+
+**Completed Sections:**
+- ✅ Antimicrobials (11 topics): 251-269
+- ✅ Clinical Syndromes (24 topics): 270-293
+- ✅ Viral Organisms (28 topics): 294-323
+- ✅ Bacterial Organisms (20 topics): 324-343
+- ✅ Fungi, Parasites, Special Topics: 344-347
+
+**All 296 topics from CLAUDE.md curriculum covered!**
+
+---
+
+## 💡 Tips
+
+- **Adding new topics:** Just mention them or drop PDFs → Claude generates cards
+- **Editing cards:** Edit markdown directly, commit changes → Claude learns
+- **Image sources:** IBCC/EMCrit work great; Febrile needs manual download
+- **Regenerating deck:** Run `python3 convert_to_anki.py` after any edits
+- **Typography:** Already optimized (19px questions, 16px answers, night mode compatible)
+
+---
+
+**Ready to generate more cards!** Add literature, provide feedback, or request specific topics.
