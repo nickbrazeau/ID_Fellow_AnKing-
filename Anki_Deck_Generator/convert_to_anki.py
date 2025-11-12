@@ -145,7 +145,7 @@ class AnkiCardConverter:
         if not lines[0].strip().startswith('|') or not lines[1].strip().startswith('|'):
             return table_text
 
-        html = '<table border="1" style="border-collapse: collapse; width: 100%; font-size: 12px; margin: 8px 0;">'
+        html = '<table border="1" style="border-collapse: collapse; width: 100%; font-size: 14px; margin: 8px 0;">'
 
         for i, line in enumerate(lines):
             line = line.strip()
@@ -164,12 +164,12 @@ class AnkiCardConverter:
             if i == 0:
                 html += '<tr style="background-color: #2c5aa0; color: white;">'
                 for cell in cells:
-                    html += f'<th style="padding: 5px; text-align: left; color: white; font-size: 12px;">{cell}</th>'
+                    html += f'<th style="padding: 5px; text-align: left; color: white; font-size: 14px;">{cell}</th>'
                 html += '</tr>'
             else:
                 html += '<tr>'
                 for cell in cells:
-                    html += f'<td style="padding: 5px; font-size: 12px;">{cell}</td>'
+                    html += f'<td style="padding: 5px; font-size: 14px;">{cell}</td>'
                 html += '</tr>'
 
         html += '</table>'
@@ -204,15 +204,15 @@ class AnkiCardConverter:
 
         text = '\n'.join(result_lines)
 
-        # Convert markdown headers to HTML with smaller font sizes and tighter margins
-        # #### Header -> <h4>Header</h4>
-        text = re.sub(r'^#### (.+)$', r'<h4 style="font-size: 13px; margin: 6px 0 4px 0;">\1</h4>', text, flags=re.MULTILINE)
-        # ### Header -> <h3>Header</h3>
-        text = re.sub(r'^### (.+)$', r'<h3 style="font-size: 14px; margin: 8px 0 4px 0;">\1</h3>', text, flags=re.MULTILINE)
-        # ## Header -> <h2>Header</h2>
-        text = re.sub(r'^## (.+)$', r'<h2 style="font-size: 15px; margin: 10px 0 6px 0;">\1</h2>', text, flags=re.MULTILINE)
-        # # Header -> <h1>Header</h1>
-        text = re.sub(r'^# (.+)$', r'<h1 style="font-size: 16px; margin: 10px 0 6px 0;">\1</h1>', text, flags=re.MULTILINE)
+        # Convert markdown headers to HTML with font sizes (20% larger)
+        # #### Header -> <h4>Header</h4> (13 * 1.2 = 15.6px)
+        text = re.sub(r'^#### (.+)$', r'<h4 style="font-size: 16px; margin: 6px 0 4px 0;">\1</h4>', text, flags=re.MULTILINE)
+        # ### Header -> <h3>Header</h3> (14 * 1.2 = 16.8px)
+        text = re.sub(r'^### (.+)$', r'<h3 style="font-size: 17px; margin: 8px 0 4px 0;">\1</h3>', text, flags=re.MULTILINE)
+        # ## Header -> <h2>Header</h2> (15 * 1.2 = 18px)
+        text = re.sub(r'^## (.+)$', r'<h2 style="font-size: 18px; margin: 10px 0 6px 0;">\1</h2>', text, flags=re.MULTILINE)
+        # # Header -> <h1>Header</h1> (16 * 1.2 = 19.2px)
+        text = re.sub(r'^# (.+)$', r'<h1 style="font-size: 19px; margin: 10px 0 6px 0;">\1</h1>', text, flags=re.MULTILINE)
 
         # Bold: **text** or __text__ -> <b>text</b>
         text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
@@ -237,13 +237,13 @@ class AnkiCardConverter:
 
         # Build the front of the card (question) - convert markdown to HTML
         front = self.markdown_to_html(card_data["question"])
-        # Wrap front in div with larger, bold font for better readability
-        front = f'<div style="font-size: 16px; line-height: 1.4; font-weight: 500;">{front}</div>'
+        # Wrap front in div with larger, bold font for better readability (16px * 1.2 = 19.2px)
+        front = f'<div style="font-size: 19px; line-height: 1.4; font-weight: 500;">{front}</div>'
 
         # Build the back of the card (answer + optional media) - convert markdown to HTML
         back = self.markdown_to_html(card_data["answer"])
-        # Wrap back in div with crisp, readable font
-        back = f'<div style="font-size: 13px; line-height: 1.3; font-weight: 400; -webkit-font-smoothing: antialiased;">{back}</div>'
+        # Wrap back in div with crisp, readable font (13px * 1.2 = 15.6px)
+        back = f'<div style="font-size: 16px; line-height: 1.3; font-weight: 400; -webkit-font-smoothing: antialiased;">{back}</div>'
         if card_data["media"] and card_data["media"].strip():
             media = card_data["media"].strip()
             # Only add images if we have actual image files (not just references)
